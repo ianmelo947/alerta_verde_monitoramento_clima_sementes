@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerta Verde - Sistema de Monitoramento Climático Rural</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c5282;
+            --secondary-color: #4299e1;
+            --accent-color: #e53e3e;
+            --success-color: #38a169;
+            --warning-color: #dd6b20;
+            --danger-color: #e53e3e;
+            --text-color: #2d3748;
+            --light-bg: #f0f8ff;
+            --card-bg: #ffffff;
+            --agriculture-green: #2d7d32;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Tela de Login/Cadastro */
+        .auth-container {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .auth-welcome {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-color), var(--agriculture-green));
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .auth-welcome h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-welcome p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-form-container {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .auth-form h3 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        
+        .password-strength {
+            height: 4px;
+            margin-top: 5px;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        
+        .strength-0 { width: 20%; background: var(--danger-color); }
+        .strength-1 { width: 40%; background: var(--danger-color); }
+        .strength-2 { width: 60%; background: var(--warning-color); }
+        .strength-3 { width: 80%; background: var(--warning-color); }
+        .strength-4 { width: 100%; background: var(--success-color); }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: #2a4365;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .auth-switch a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Notificações */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--success-color);
+        }
+        
+        .notification.error {
+            background: var(--danger-color);
+        }
+        
+        .notification.warning {
+            background: var(--warning-color);
+        }
+        
+        /* Conteúdo principal (após login) */
+        .app-content {
+            display: none;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--agriculture-green));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .user-info {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.3rem;
+        }
+        
+        .user-info span {
+            font-size: 0.9rem;
+        }
+        
+        .user-greeting {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: var(--secondary-color);
+        }
+        
+        .tab {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1rem;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .tab.active {
+            background: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tab:hover {
+            background: #2a4365;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .search-box {
+            padding: 1.5rem;
+            background: var(--light-bg);
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 50px 0 0 50px;
+            width: 70%;
+            font-size: 1rem;
+            outline: none;
+            border: 1px solid #ddd;
+        }
+        
+        .search-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 0 50px 50px 0;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .search-btn:hover {
+            background: #2a4365;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .current-weather {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .temp {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin: 1rem 0;
+        }
+        
+        .weather-desc {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .weather-icon {
+            font-size: 2rem;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .detail-card {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            color: var(--primary-color);
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .location {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+        
+        .forecast {
+            margin-top: 2rem;
+        }
+        
+        .forecast-title {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .forecast-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .forecast-card {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .forecast-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .forecast-day {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .forecast-date {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+        }
+        
+        .forecast-temp {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+        
+        .forecast-desc {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-top: 0.5rem;
+        }
+        
+        .temp-range {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            color: var(--danger-color);
+            display: none;
+        }
+        
+        /* Estilos para a aba de Agricultura */
+        .agriculture-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+        
+        .crop-form {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .recommendations {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .recommendation-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--success-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .crop-list {
+            margin-top: 1rem;
+        }
+        
+        .crop-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--agriculture-green);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .crop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .crop-name {
+            font-weight: bold;
+            color: var(--agriculture-green);
+        }
+        
+        .crop-date {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .crop-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .crop-detail {
+            background: #f0f8ff;
+            padding: 0.5rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .agriculture-alert {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-danger {
+            background: #fed7d7;
+            border-left-color: var(--danger-color);
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            border-left-color: var(--success-color);
+        }
+        
+        .api-status {
+            text-align: center;
+            padding: 0.5rem;
+            background: #e6fffa;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .offline-warning {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning-color);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: #edf2f7;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+            }
+            
+            .agriculture-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                padding: 0.8rem 1rem;
+            }
+            
+            .temp {
+                font-size: 3rem;
+            }
+            
+            .search-input {
+                width: 60%;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .forecast-cards {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            
+            .user-info {
+                position: static;
+                transform: none;
+                justify-content: center;
+                align-items: center;
+                margin-top: 1rem;
+            }
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Tela de Autenticação -->
+        <div class="auth-container" id="auth-container">
+            <div class="auth-welcome">
+                <h2><i class="fas fa-tractor"></i> Alerta Verde</h2>
+                <p>Acompanhe as condições climáticas e gerencie suas culturas com nossa plataforma especializada para produtores rurais.</p>
+                <div style="font-size: 5rem; opacity: 0.7;">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <p>Cadastre-se para acessar previsões meteorológicas, recomendações de plantio e muito mais!</p>
+            </div>
+            <div class="auth-form-container">
+                <form class="auth-form" id="login-form">
+                    <h3>Entrar no Sistema</h3>
+                    <div class="form-group">
+                        <label for="login-email">E-mail:</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="seu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Senha:</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="Sua senha" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                    <div class="auth-switch">
+                        Não tem uma conta? <a href="#" id="switch-to-register">Cadastre-se</a>
+                    </div>
+                </form>
+                
+                <form class="auth-form" id="register-form" style="display: none;">
+                    <h3>Criar Conta</h3>
+                    <div class="form-group">
+                        <label for="register-name">Nome Completo:</label>
+                        <input type="text" id="register-name" class="form-control" placeholder="Seu nome completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">E-mail:</label>
+                        <input type="email" id="register-email" class="form-control" placeholder="seu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Senha:</label>
+                        <input type="password" id="register-password" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                        <div class="password-strength" id="password-strength"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm">Confirmar Senha:</label>
+                        <input type="password" id="register-confirm" class="form-control" placeholder="Digite novamente a senha" required>
+                        <div class="password-match" id="password-match" style="font-size: 0.8rem; margin-top: 5px;"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="register-btn" disabled>Cadastrar</button>
+                    <div class="auth-switch">
+                        Já tem uma conta? <a href="#" id="switch-to-login">Fazer login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal (após login) -->
+        <div class="app-content" id="app-content">
+            <header>
+                <h1><i class="fas fa-seedling"></i> Alerta Verde</h1>
+                <p class="subtitle">Acompanhamento meteorológico especializado para produtores rurais</p>
+                <div class="user-info">
+                    <span class="user-greeting" id="user-greeting">Olá, Usuário!</span>
+                    <span id="user-email">usuario@exemplo.com</span>
+                    <button class="logout-btn" id="logout-btn">Sair <i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="clima">Condições Climáticas</button>
+                <button class="tab" data-tab="agricultura">Gestão Agrícola</button>
+            </div>
+            
+            <!-- Aba de Clima -->
+            <div class="tab-content active" id="clima-content">
+                <div class="search-box" role="search">
+                    <label for="city-search" class="sr-only">Buscar cidade</label>
+                    <input type="text" id="city-search" class="search-input" placeholder="Digite uma cidade..." value="Cabo de Santo Agostinho">
+                    <button class="search-btn" aria-label="Buscar dados climáticos">
+                        <i class="fas fa-search" aria-hidden="true"></i> Buscar
+                    </button>
+                </div>
+                
+                <div class="offline-warning" id="offline-warning">
+                    <i class="fas fa-wifi"></i> Você está visualizando dados offline. Algumas informações podem não estar atualizadas.
+                </div>
+                
+                <div class="api-status" id="api-status">
+                    <i class="fas fa-sync-alt"></i> Conectado à API OpenWeatherMap
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Carregando dados climáticos...</p>
+                </div>
+                
+                <div class="error-message" id="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p id="error-text">Não foi possível carregar os dados. Verifique o nome da cidade e tente novamente.</p>
+                </div>
+                
+                <div id="weather-content">
+                    <div class="current-weather">
+                        <div class="weather-desc">
+                            <i class="fas fa-cloud-sun weather-icon"></i>
+                            <span class="weather-text">Carregando...</span>
+                        </div>
+                        <div class="temp">--°C</div>
+                        
+                        <div class="details-grid">
+                            <div class="detail-card">
+                                <i class="fas fa-tint"></i>
+                                <div class="detail-value">--%</div>
+                                <div class="detail-label">Umidade</div>
+                            </div>
+                            <div class="detail-card">
+                                <i class="fas fa-wind"></i>
+                                <div class="detail-value">-- km/h</div>
+                                <div class="detail-label">Vel. Vento</div>
+                            </div>
+                            <div class="detail-card">
+                                <i class="fas fa-compress-alt"></i>
+                                <div class="detail-value">-- hPa</div>
+                                <div class="detail-label">Pressão</div>
+                            </div>
+                            <div class="detail-card">
+                                <i class="fas fa-sun"></i>
+                                <div class="detail-value">--</div>
+                                <div class="detail-label">Índice UV</div>
+                            </div>
+                        </div>
+                        
+                        <div class="location">
+                            <i class="fas fa-map-marker-alt"></i> Carregando localização...
+                        </div>
+                    </div>
+                    
+                    <div class="agriculture-alert" id="weather-alert">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="alert-text">Aguardando dados climáticos...</span>
+                    </div>
+                    
+                    <div class="forecast">
+                        <h2 class="forecast-title">Previsão para os próximos 5 dias</h2>
+                        <div class="forecast-cards" id="forecast-container">
+                            <!-- Previsão será carregada aqui dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Aba de Agricultura -->
+            <div class="tab-content" id="agricultura-content">
+                <div class="agriculture-grid">
+                    <div class="crop-form">
+                        <h3><i class="fas fa-plus-circle"></i> Cadastrar Nova Cultura</h3>
+                        <form id="crop-form">
+                            <div class="form-group">
+                                <label for="crop-name">Nome da Cultura:</label>
+                                <input type="text" id="crop-name" class="form-control" placeholder="Ex: Milho, Feijão, etc." required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="crop-type">Tipo de Cultura:</label>
+                                <select id="crop-type" class="form-control" required>
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="grãos">Grãos</option>
+                                    <option value="hortaliças">Hortaliças</option>
+                                    <option value="frutas">Frutas</option>
+                                    <option value="raízes">Raízes e Tubérculos</option>
+                                    <option value="outros">Outros</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="planting-date">Data de Plantio:</label>
+                                <input type="date" id="planting-date" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="crop-area">Área (hectares):</label>
+                                <input type="number" id="crop-area" class="form-control" step="0.1" min="0.1" placeholder="Ex: 2.5" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Cadastrar Cultura
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="recommendations">
+                        <h3><i class="fas fa-lightbulb"></i> Recomendações Baseadas no Clima</h3>
+                        <div id="recommendations-list">
+                            <div class="recommendation-card">
+                                <h4><i class="fas fa-check-circle"></i> Cultivos Recomendados</h4>
+                                <p id="recommended-crops">Aguardando dados climáticos...</p>
+                            </div>
+                            
+                            <div class="recommendation-card">
+                                <h4><i class="fas fa-tint"></i> Recomendação de Irrigação</h4>
+                                <p id="irrigation-tip">Aguardando dados climáticos...</p>
+                            </div>
+                            
+                            <div class="recommendation-card">
+                                <h4><i class="fas fa-calendar-alt"></i> Período Ideal</h4>
+                                <p id="planting-period">Aguardando dados climáticos...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="crop-list">
+                            <h4><i class="fas fa-list"></i> Suas Culturas Cadastradas</h4>
+                            <div id="crops-container">
+                                <!-- As culturas serão adicionadas aqui dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer>
+                <p>Dados fornecidos por OpenWeatherMap • Especializado para região de Cabo de Santo Agostinho-PE • Atualizado em: <span class="update-time">--:--</span></p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // MÓDULO DE SEGURANÇA
+        // =============================================
+        class SecurityManager {
+            static hashPassword(password) {
+                // Hash simples (em produção usar bcrypt)
+                let hash = 0;
+                for (let i = 0; i < password.length; i++) {
+                    const char = password.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash).toString(36);
+            }
+
+            static validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            static sanitizeInput(input) {
+                const div = document.createElement('div');
+                div.textContent = input;
+                return div.innerHTML;
+            }
+
+            static calculatePasswordStrength(password) {
+                let strength = 0;
+                if (password.length >= 6) strength++;
+                if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+                if (password.match(/\d/)) strength++;
+                if (password.match(/[^a-zA-Z\d]/)) strength++;
+                return strength;
+            }
+        }
+
+        // =============================================
+        // MÓDULO DE GERENCIAMENTO DE ARMAZENAMENTO
+        // =============================================
+        class StorageManager {
+            static getUsers() {
+                return JSON.parse(localStorage.getItem('agricultureSystem_users')) || [];
+            }
+
+            static saveUser(user) {
+                const users = this.getUsers();
+                const existingIndex = users.findIndex(u => u.email === user.email);
+                
+                if (existingIndex >= 0) {
+                    users[existingIndex] = user;
+                } else {
+                    users.push(user);
+                }
+                
+                localStorage.setItem('agricultureSystem_users', JSON.stringify(users));
+            }
+
+            static getUserData(email) {
+                const key = `agricultureSystem_userData_${btoa(email)}`;
+                return JSON.parse(localStorage.getItem(key)) || { crops: [], preferences: {} };
+            }
+
+            static saveUserData(email, data) {
+                const key = `agricultureSystem_userData_${btoa(email)}`;
+                localStorage.setItem(key, JSON.stringify(data));
+            }
+
+            static getLoggedInUser() {
+                return localStorage.getItem('agricultureSystem_loggedInUser');
+            }
+
+            static setLoggedInUser(email) {
+                localStorage.setItem('agricultureSystem_loggedInUser', email);
+            }
+
+            static clearLoggedInUser() {
+                localStorage.removeItem('agricultureSystem_loggedInUser');
+            }
+        }
+
+        // =============================================
+        // MÓDULO DE GERENCIAMENTO DE ERROS
+        // =============================================
+        class ErrorHandler {
+            static init() {
+                window.addEventListener('error', this.handleGlobalError.bind(this));
+                window.addEventListener('unhandledrejection', this.handlePromiseRejection.bind(this));
+            }
+
+            static handleGlobalError(event) {
+                console.error('Erro global:', event.error);
+                this.showNotification('Ocorreu um erro inesperado. Tente novamente.', 'error');
+            }
+
+            static handlePromiseRejection(event) {
+                console.error('Promise rejeitada:', event.reason);
+                event.preventDefault();
+                this.showNotification('Erro na operação. Tente novamente.', 'error');
+            }
+
+            static showNotification(message, type = 'error') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
+
+            static getUserFriendlyError(error) {
+                const messages = {
+                    'Failed to fetch': 'Erro de conexão. Verifique sua internet.',
+                    'city not found': 'Cidade não encontrada.',
+                    'invalid API key': 'Problema no serviço meteorológico.',
+                    'Network Error': 'Erro de rede. Verifique sua conexão.'
+                };
+                return messages[error.message] || 'Erro ao carregar dados climáticos';
+            }
+        }
+
+        // =============================================
+        // MÓDULO DE CACHE DE DADOS
+        // =============================================
+        class WeatherCache {
+            constructor() {
+                this.data = {};
+                this.CACHE_DURATION = 10 * 60 * 1000; // 10 minutos
+            }
+
+            set(city, data) {
+                this.data[city] = {
+                    data,
+                    timestamp: Date.now()
+                };
+            }
+
+            get(city) {
+                const cached = this.data[city];
+                if (cached && (Date.now() - cached.timestamp) < this.CACHE_DURATION) {
+                    return cached.data;
+                }
+                return null;
+            }
+
+            clear() {
+                this.data = {};
+            }
+        }
+
+        // =============================================
+        // MÓDULO PRINCIPAL DA APLICAÇÃO
+        // =============================================
+        class AgricultureApp {
+            constructor() {
+                this.API_KEY = 'c078160b604897141ff65b50363e12a8';
+                this.BASE_URL = 'https://api.openweathermap.org/data/2.5';
+                this.weatherCache = new WeatherCache();
+                this.init();
+            }
+
+            init() {
+                ErrorHandler.init();
+                this.setupEventListeners();
+                this.checkLoggedInUser();
+                this.setupRealTimeValidation();
+            }
+
+            setupEventListeners() {
+                // Autenticação
+                document.getElementById('switch-to-register').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.showRegisterForm();
+                });
+                
+                document.getElementById('switch-to-login').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.showLoginForm();
+                });
+                
+                document.getElementById('login-form').addEventListener('submit', (e) => this.handleLogin(e));
+                document.getElementById('register-form').addEventListener('submit', (e) => this.handleRegister(e));
+                document.getElementById('logout-btn').addEventListener('click', () => this.logoutUser());
+
+                // Navegação
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', () => this.switchTab(tab));
+                });
+
+                // Busca
+                document.querySelector('.search-btn').addEventListener('click', () => this.handleSearch());
+                document.getElementById('city-search').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.handleSearch();
+                });
+
+                // Agricultura
+                document.getElementById('crop-form').addEventListener('submit', (e) => this.handleCropSubmit(e));
+            }
+
+            setupRealTimeValidation() {
+                const registerPassword = document.getElementById('register-password');
+                const registerConfirm = document.getElementById('register-confirm');
+                
+                registerPassword.addEventListener('input', () => this.validatePasswordStrength());
+                registerConfirm.addEventListener('input', () => this.validatePasswordMatch());
+            }
+
+            validatePasswordStrength() {
+                const password = document.getElementById('register-password').value;
+                const strength = SecurityManager.calculatePasswordStrength(password);
+                const strengthBar = document.getElementById('password-strength');
+                
+                strengthBar.className = `password-strength strength-${strength}`;
+                
+                this.updateRegisterButton();
+            }
+
+            validatePasswordMatch() {
+                const password = document.getElementById('register-password').value;
+                const confirm = document.getElementById('register-confirm').value;
+                const matchElement = document.getElementById('password-match');
+                
+                if (confirm === '') {
+                    matchElement.textContent = '';
+                    matchElement.style.color = '';
+                } else if (password === confirm) {
+                    matchElement.textContent = '✓ Senhas coincidem';
+                    matchElement.style.color = 'var(--success-color)';
+                } else {
+                    matchElement.textContent = '✗ Senhas não coincidem';
+                    matchElement.style.color = 'var(--danger-color)';
+                }
+                
+                this.updateRegisterButton();
+            }
+
+            updateRegisterButton() {
+                const password = document.getElementById('register-password').value;
+                const confirm = document.getElementById('register-confirm').value;
+                const registerBtn = document.getElementById('register-btn');
+                
+                const isStrong = SecurityManager.calculatePasswordStrength(password) >= 2;
+                const isMatching = password === confirm && password !== '';
+                
+                registerBtn.disabled = !(isStrong && isMatching);
+            }
+
+            showLoginForm() {
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('register-form').style.display = 'none';
+            }
+
+            showRegisterForm() {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+            }
+
+            handleLogin(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (!SecurityManager.validateEmail(email)) {
+                    ErrorHandler.showNotification('Por favor, insira um e-mail válido.', 'error');
+                    return;
+                }
+                
+                const users = StorageManager.getUsers();
+                const hashedPassword = SecurityManager.hashPassword(password);
+                const user = users.find(u => u.email === email && u.password === hashedPassword);
+                
+                if (user) {
+                    this.loginUser(email);
+                } else {
+                    ErrorHandler.showNotification('E-mail ou senha incorretos!', 'error');
+                }
+            }
+
+            handleRegister(e) {
+                e.preventDefault();
+                const name = SecurityManager.sanitizeInput(document.getElementById('register-name').value);
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm').value;
+                
+                if (!SecurityManager.validateEmail(email)) {
+                    ErrorHandler.showNotification('Por favor, insira um e-mail válido.', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    ErrorHandler.showNotification('As senhas não coincidem!', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    ErrorHandler.showNotification('A senha deve ter pelo menos 6 caracteres!', 'error');
+                    return;
+                }
+                
+                const users = StorageManager.getUsers();
+                if (users.find(u => u.email === email)) {
+                    ErrorHandler.showNotification('Este e-mail já está cadastrado!', 'error');
+                    return;
+                }
+                
+                const hashedPassword = SecurityManager.hashPassword(password);
+                StorageManager.saveUser({ name, email, password: hashedPassword });
+                
+                ErrorHandler.showNotification('Cadastro realizado com sucesso! Faça login para continuar.', 'success');
+                this.showLoginForm();
+                document.getElementById('login-email').value = email;
+            }
+
+            loginUser(email) {
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
+                document.getElementById('user-email').textContent = email;
+                
+                const users = StorageManager.getUsers();
+                const user = users.find(u => u.email === email);
+                const userName = user ? user.name.split(' ')[0] : 'Usuário';
+                document.getElementById('user-greeting').textContent = `Olá, ${userName}!`;
+                
+                StorageManager.setLoggedInUser(email);
+                
+                // Inicializar dados do usuário se necessário
+                this.initializeUserData(email);
+                
+                // Carregar dados iniciais
+                const userData = StorageManager.getUserData(email);
+                const defaultCity = userData.preferences?.defaultCity || 'Cabo de Santo Agostinho';
+                document.getElementById('city-search').value = defaultCity;
+                
+                this.fetchWeatherData(defaultCity);
+                this.loadCrops();
+            }
+
+            initializeUserData(email) {
+                const userData = StorageManager.getUserData(email);
+                if (!userData.crops) {
+                    userData.crops = [];
+                }
+                if (!userData.preferences) {
+                    userData.preferences = { defaultCity: 'Cabo de Santo Agostinho' };
+                }
+                StorageManager.saveUserData(email, userData);
+            }
+
+            logoutUser() {
+                StorageManager.clearLoggedInUser();
+                document.getElementById('auth-container').style.display = 'flex';
+                document.getElementById('app-content').style.display = 'none';
+                document.getElementById('login-form').reset();
+                document.getElementById('register-form').reset();
+                this.showLoginForm();
+            }
+
+            checkLoggedInUser() {
+                const loggedInUser = StorageManager.getLoggedInUser();
+                if (loggedInUser) {
+                    this.loginUser(loggedInUser);
+                }
+            }
+
+            switchTab(tab) {
+                const tabId = tab.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            }
+
+            handleSearch() {
+                const city = document.getElementById('city-search').value.trim();
+                if (city) {
+                    this.fetchWeatherData(city);
+                }
+            }
+
+            async fetchWeatherData(city) {
+                const loadingEl = document.getElementById('loading');
+                const errorEl = document.getElementById('error-message');
+                const weatherContent = document.getElementById('weather-content');
+                const apiStatus = document.getElementById('api-status');
+                const offlineWarning = document.getElementById('offline-warning');
+                
+                // Verificar cache primeiro
+                const cached = this.weatherCache.get(city);
+                if (cached) {
+                    this.updateWeatherUI(cached.current);
+                    this.updateForecastUI(cached.forecast);
+                    apiStatus.innerHTML = '<i class="fas fa-database"></i> Dados carregados do cache';
+                    apiStatus.style.background = '#e6fffa';
+                    return;
+                }
+                
+                loadingEl.style.display = 'block';
+                weatherContent.style.display = 'none';
+                errorEl.style.display = 'none';
+                offlineWarning.style.display = 'none';
+                apiStatus.innerHTML = '<i class="fas fa-sync-alt"></i> Buscando dados da API...';
+                apiStatus.style.background = '#e6fffa';
+                
+                try {
+                    const [currentData, forecastData] = await Promise.all([
+                        this.fetchCurrentWeather(city),
+                        this.fetch5DayForecast(city)
+                    ]);
+                    
+                    if (!currentData || !forecastData) {
+                        throw new Error('Dados incompletos da API');
+                    }
+                    
+                    // Salvar no cache
+                    this.weatherCache.set(city, { current: currentData, forecast: forecastData });
+                    
+                    this.updateWeatherUI(currentData);
+                    this.updateForecastUI(forecastData);
+                    
+                    apiStatus.innerHTML = '<i class="fas fa-check-circle"></i> Dados atualizados com sucesso';
+                    apiStatus.style.background = '#c6f6d5';
+                    
+                } catch (error) {
+                    console.error('Erro ao buscar dados:', error);
+                    
+                    // Tentar usar dados offline
+                    const offlineData = this.getOfflineWeatherData(city);
+                    if (offlineData) {
+                        offlineWarning.style.display = 'block';
+                        this.updateWeatherUI(offlineData.current);
+                        this.updateForecastUI(offlineData.forecast);
+                    } else {
+                        loadingEl.style.display = 'none';
+                        errorEl.style.display = 'block';
+                        document.getElementById('error-text').textContent = ErrorHandler.getUserFriendlyError(error);
+                        apiStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro na conexão com a API';
+                        apiStatus.style.background = '#fed7d7';
+                    }
+                }
+            }
+
+            async fetchCurrentWeather(city) {
+                const url = `${this.BASE_URL}/weather?q=${city}&units=metric&appid=${this.API_KEY}&lang=pt_br`;
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('city not found');
+                }
+                return await response.json();
+            }
+
+            async fetch5DayForecast(city) {
+                const url = `${this.BASE_URL}/forecast?q=${city}&units=metric&appid=${this.API_KEY}&lang=pt_br`;
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar previsão');
+                }
+                return await response.json();
+            }
+
+            getOfflineWeatherData(city) {
+                // Dados de fallback para demonstração
+                return this.weatherCache.get(city) || null;
+            }
+
+            updateWeatherUI(data) {
+                const weatherIcons = {
+                    'Clear': 'fa-sun',
+                    'Clouds': 'fa-cloud',
+                    'Rain': 'fa-cloud-rain',
+                    'Drizzle': 'fa-cloud-sun-rain',
+                    'Thunderstorm': 'fa-bolt',
+                    'Snow': 'fa-snowflake',
+                    'Mist': 'fa-smog',
+                    'Smoke': 'fa-smog',
+                    'Haze': 'fa-smog',
+                    'Dust': 'fa-smog',
+                    'Fog': 'fa-smog',
+                    'Sand': 'fa-smog',
+                    'Ash': 'fa-smog',
+                    'Squall': 'fa-wind',
+                    'Tornado': 'fa-tornado'
+                };
+
+                document.querySelector('.temp').textContent = `${Math.round(data.main.temp)}°C`;
+                document.querySelector('.weather-text').textContent = data.weather[0].description;
+                
+                const weatherIcon = document.querySelector('.weather-icon');
+                const iconClass = weatherIcons[data.weather[0].main] || 'fa-cloud';
+                weatherIcon.className = `fas ${iconClass} weather-icon`;
+                
+                const detailValues = document.querySelectorAll('.detail-value');
+                detailValues[0].textContent = `${data.main.humidity}%`;
+                detailValues[1].textContent = `${data.wind.speed} km/h`;
+                detailValues[2].textContent = `${data.main.pressure} hPa`;
+                detailValues[3].textContent = data.visibility ? `${(data.visibility / 1000).toFixed(1)}` : '--';
+                
+                document.querySelector('.location').innerHTML = 
+                    `<i class="fas fa-map-marker-alt"></i> ${data.name}, ${data.sys.country}`;
+                
+                const now = new Date();
+                document.querySelector('.update-time').textContent = now.toLocaleTimeString('pt-BR');
+                
+                this.generateRecommendations(data);
+                
+                document.getElementById('weather-content').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'none';
+            }
+
+            updateForecastUI(forecastData) {
+                const weekDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+                const weatherIcons = {
+                    'Clear': 'fa-sun',
+                    'Clouds': 'fa-cloud',
+                    'Rain': 'fa-cloud-rain',
+                    'Drizzle': 'fa-cloud-sun-rain',
+                    'Thunderstorm': 'fa-bolt',
+                    'Snow': 'fa-snowflake',
+                    'Mist': 'fa-smog'
+                };
+
+                const forecastContainer = document.getElementById('forecast-container');
+                forecastContainer.innerHTML = '';
+                
+                const dailyForecasts = [];
+                const processedDays = new Set();
+                
+                forecastData.list.forEach(item => {
+                    const date = new Date(item.dt * 1000);
+                    const dateString = date.toDateString();
+                    
+                    if (!processedDays.has(dateString) && dailyForecasts.length < 5) {
+                        processedDays.add(dateString);
+                        dailyForecasts.push({
+                            date: dateString,
+                            dayName: weekDays[date.getDay()],
+                            temp: Math.round(item.main.temp),
+                            temp_min: Math.round(item.main.temp_min),
+                            temp_max: Math.round(item.main.temp_max),
+                            description: item.weather[0].description,
+                            icon: item.weather[0].main,
+                            humidity: item.main.humidity
+                        });
+                    }
+                });
+                
+                dailyForecasts.forEach(day => {
+                    const forecastCard = document.createElement('div');
+                    forecastCard.className = 'forecast-card';
+                    const iconClass = weatherIcons[day.icon] || 'fa-cloud';
+                    
+                    forecastCard.innerHTML = `
+                        <div class="forecast-day">${day.dayName}</div>
+                        <div class="forecast-date">${new Date(day.date).toLocaleDateString('pt-BR')}</div>
+                        <i class="fas ${iconClass}" style="font-size: 2rem; color: var(--secondary-color); margin: 0.5rem 0;"></i>
+                        <div class="forecast-temp">${day.temp}°C</div>
+                        <div class="temp-range">Min: ${day.temp_min}°C / Max: ${day.temp_max}°C</div>
+                        <div class="forecast-desc">${day.description}</div>
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #718096;">
+                            <i class="fas fa-tint"></i> ${day.humidity}%
+                        </div>
+                    `;
+                    
+                    forecastContainer.appendChild(forecastCard);
+                });
+            }
+
+            generateRecommendations(weatherData) {
+                const cropRecommendations = {
+                    'quente-seco': ['Coco', 'Cana-de-açúcar', 'Manga', 'Caju', 'Abacaxi', 'Sorgo'],
+                    'quente-umido': ['Banana', 'Mamão', 'Maracujá', 'Mandioca', 'Inhame', 'Abacate'],
+                    'temperado': ['Milho', 'Feijão', 'Tomate', 'Pimentão', 'Cenoura', 'Alface'],
+                    'chuvoso': ['Arroz', 'Banana', 'Mandioca', 'Taro', 'Elódea', 'Berinjela']
+                };
+
+                const temp = weatherData.main.temp;
+                const humidity = weatherData.main.humidity;
+                const weatherMain = weatherData.weather[0].main;
+                
+                let climateType = '';
+                let irrigation = '';
+                let period = '';
+                
+                if (temp > 28 && humidity < 60) {
+                    climateType = 'quente-seco';
+                    irrigation = 'Intensiva - 3 vezes ao dia';
+                    period = 'Plantio ideal imediato';
+                } else if (temp > 25 && humidity > 70) {
+                    climateType = 'quente-umido';
+                    irrigation = 'Moderada - 2 vezes ao dia';
+                    period = 'Bom período para plantio';
+                } else if (temp > 20 && temp <= 25) {
+                    climateType = 'temperado';
+                    irrigation = 'Leve - 1 vez ao dia';
+                    period = 'Período favorável';
+                } else {
+                    climateType = 'chuvoso';
+                    irrigation = 'Reduzida - Apenas se necessário';
+                    period = 'Aguardar melhora do clima';
+                }
+                
+                document.getElementById('recommended-crops').textContent = cropRecommendations[climateType].join(', ');
+                document.getElementById('irrigation-tip').textContent = irrigation;
+                document.getElementById('planting-period').textContent = period;
+                
+                const alertText = document.getElementById('alert-text');
+                const weatherAlert = document.getElementById('weather-alert');
+                
+                if (temp > 35) {
+                    alertText.textContent = 'ALERTA: Temperatura muito alta para a maioria das culturas';
+                    weatherAlert.className = 'agriculture-alert alert-danger';
+                } else if (temp < 15) {
+                    alertText.textContent = 'ALERTA: Temperatura muito baixa para culturas tropicais';
+                    weatherAlert.className = 'agriculture-alert alert-danger';
+                } else if (humidity < 40) {
+                    alertText.textContent = 'ALERTA: Umidade muito baixa - aumentar irrigação';
+                    weatherAlert.className = 'agriculture-alert alert-danger';
+                } else if (weatherMain === 'Rain') {
+                    alertText.textContent = 'Chuva prevista - reduzir irrigação';
+                    weatherAlert.className = 'agriculture-alert';
+                } else {
+                    alertText.textContent = 'Condições favoráveis para cultivo';
+                    weatherAlert.className = 'agriculture-alert alert-success';
+                }
+            }
+
+            loadCrops() {
+                const loggedInUser = StorageManager.getLoggedInUser();
+                if (!loggedInUser) return;
+                
+                const userData = StorageManager.getUserData(loggedInUser);
+                const savedCrops = userData?.crops || [];
+                const cropsContainer = document.getElementById('crops-container');
+                
+                cropsContainer.innerHTML = '';
+                
+                if (savedCrops.length === 0) {
+                    cropsContainer.innerHTML = '<p>Nenhuma cultura cadastrada ainda.</p>';
+                    return;
+                }
+                
+                savedCrops.forEach((crop, index) => {
+                    const cropItem = document.createElement('div');
+                    cropItem.className = 'crop-item';
+                    const daysPlanted = Math.floor((new Date() - new Date(crop.plantingDate)) / (1000 * 60 * 60 * 24));
+                    
+                    cropItem.innerHTML = `
+                        <div class="crop-header">
+                            <span class="crop-name">${SecurityManager.sanitizeInput(crop.name)}</span>
+                            <span class="crop-date">Plantio: ${new Date(crop.plantingDate).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        <div class="crop-details">
+                            <div class="crop-detail">Tipo: ${SecurityManager.sanitizeInput(crop.type)}</div>
+                            <div class="crop-detail">Área: ${crop.area} ha</div>
+                            <div class="crop-detail">Dias: ${daysPlanted}d</div>
+                        </div>
+                        <button onclick="app.deleteCrop(${index})" class="btn" style="background: var(--danger-color); color: white; margin-top: 0.5rem; padding: 0.3rem 0.8rem;">
+                            <i class="fas fa-trash"></i> Remover
+                        </button>
+                    `;
+                    cropsContainer.appendChild(cropItem);
+                });
+            }
+
+            handleCropSubmit(e) {
+                e.preventDefault();
+                
+                const cropData = {
+                    name: SecurityManager.sanitizeInput(document.getElementById('crop-name').value),
+                    type: document.getElementById('crop-type').value,
+                    plantingDate: document.getElementById('planting-date').value,
+                    area: document.getElementById('crop-area').value
+                };
+                
+                const loggedInUser = StorageManager.getLoggedInUser();
+                if (!loggedInUser) {
+                    ErrorHandler.showNotification('Erro: usuário não encontrado. Faça login novamente.', 'error');
+                    return;
+                }
+                
+                const userData = StorageManager.getUserData(loggedInUser);
+                userData.crops.push(cropData);
+                StorageManager.saveUserData(loggedInUser, userData);
+                
+                document.getElementById('crop-form').reset();
+                document.getElementById('planting-date').valueAsDate = new Date();
+                
+                this.loadCrops();
+                
+                ErrorHandler.showNotification('Cultura cadastrada com sucesso!', 'success');
+            }
+
+            deleteCrop(index) {
+                const loggedInUser = StorageManager.getLoggedInUser();
+                if (!loggedInUser) return;
+                
+                const userData = StorageManager.getUserData(loggedInUser);
+                userData.crops.splice(index, 1);
+                StorageManager.saveUserData(loggedInUser, userData);
+                this.loadCrops();
+                
+                ErrorHandler.showNotification('Cultura removida com sucesso!', 'success');
+            }
+        }
+
+        // =============================================
+        // INICIALIZAÇÃO DA APLICAÇÃO
+        // =============================================
+        let app;
+        document.addEventListener('DOMContentLoaded', function() {
+            app = new AgricultureApp();
+            
+            // Configurar data atual no formulário
+            document.getElementById('planting-date').valueAsDate = new Date();
+            
+            // Expor app globalmente para funções de callback
+            window.app = app;
+        });
+    </script>
+</body>
+</html>
