@@ -1,1 +1,1 @@
-IAN FALANDO: código tá básico e apenas uma simples tela de pesquisa aparece por enquanto, a ideia é trabalhar encima disso, adicionando banco de dados com tela de login e um servidor pra manter sempre ligado, tô pesquisando pra ver se a melhor chave API vai ser a da Open Weather ou de outro fornecedor
+IAN FALANDO: o frontend já tá finalizado, e o pessoal do grupo tá mexendo com C++ para implementação do bakend para fazer a paralelização com OpenCL e colocar o banco de dados no Docker
